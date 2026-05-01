@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anunciar Produto - Agro Conecta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-50">
+
+    <div class="max-w-2xl mx-auto px-6 py-10">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-4xl font-bold text-emerald-700">Anunciar Produto</h1>
+            <a href="index.html" class="btn-secondary">Voltar ao Início</a>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-lg p-8">
+            <form id="anuncio-form" onsubmit="publicarAnuncio(event)" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Nome do Produto</label>
+                    <input id="nome-produto" type="text" required 
+                           class="w-full border border-gray-300 rounded-2xl px-5 py-4" placeholder="Ex: Morango Orgânico">
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Preço</label>
+                        <input id="preco" type="text" required 
+                               class="w-full border border-gray-300 rounded-2xl px-5 py-4" placeholder="R$ 00,00">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Unidade</label>
+                        <select id="unidade" class="w-full border border-gray-300 rounded-2xl px-5 py-4">
+                            <option value="kg">kg</option>
+                            <option value="saco">saco</option>
+                            <option value="caixa">caixa</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Descrição</label>
+                    <textarea id="descricao" rows="4" required
+                              class="w-full border border-gray-300 rounded-3xl px-5 py-4" 
+                              placeholder="Descreva seu produto (quantidade, qualidade, colheita, etc.)"></textarea>
+                </div>
+
+                <button type="submit" 
+                        class="w-full py-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-3xl font-semibold text-xl">
+                    Publicar Anúncio
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

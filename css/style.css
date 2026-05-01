@@ -6,31 +6,22 @@
     --primary-dark: #166534;
 }
 
-* {
-    font-family: 'Inter', system_ui, sans-serif;
-}
+* { font-family: 'Inter', system_ui, sans-serif; }
+.logo-font { font-family: 'Poppins', sans-serif; }
 
-.logo-font {
-    font-family: 'Poppins', sans-serif;
-}
-
-/* Hero */
 .hero-bg {
     background: linear-gradient(rgba(21, 128, 61, 0.78), rgba(21, 128, 61, 0.78)), 
                 url('https://picsum.photos/id/1015/1920/1080') center/cover no-repeat;
 }
 
-/* Product Card */
 .product-card {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 .product-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15);
 }
 
-/* Search Bar */
 .search-bar {
     background: white;
     border: 2px solid #a7f3d0;
@@ -40,19 +31,11 @@
     align-items: center;
     gap: 12px;
 }
-
 .search-bar:focus-within {
     border-color: var(--primary);
     box-shadow: 0 0 0 4px rgba(21, 128, 61, 0.15);
 }
 
-.search-bar input {
-    flex: 1;
-    outline: none;
-    background: transparent;
-}
-
-/* Botões */
 .btn-primary {
     background-color: var(--primary);
     color: white;
@@ -61,11 +44,7 @@
     font-weight: 600;
     transition: all 0.3s;
 }
-
-.btn-primary:hover {
-    background-color: var(--primary-dark);
-    transform: translateY(-2px);
-}
+.btn-primary:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
 
 .btn-secondary {
     padding: 12px 28px;
@@ -73,15 +52,17 @@
     font-weight: 600;
     border: 2px solid var(--primary);
     color: var(--primary);
-    background: transparent;
     transition: all 0.3s;
 }
+.btn-secondary:hover { background-color: #f0fdf4; }
 
-.btn-secondary:hover {
-    background-color: #f0fdf4;
+.large-button {
+    padding: 16px 32px;
+    font-size: 1.1rem;
+    border-radius: 9999px;
+    font-weight: 600;
 }
 
-/* User Info */
 .user-info {
     display: flex;
     align-items: center;
@@ -92,8 +73,7 @@
 }
 
 .avatar {
-    width: 36px;
-    height: 36px;
+    width: 36px; height: 36px;
     background: #d1fae5;
     border-radius: 9999px;
     display: flex;
@@ -102,26 +82,8 @@
     font-size: 1.4rem;
 }
 
-/* Modal Animation */
-.modal {
-    animation: modalPop 0.3s ease forwards;
-}
-
+.modal { animation: modalPop 0.3s ease forwards; }
 @keyframes modalPop {
     from { opacity: 0; transform: scale(0.95) translateY(30px); }
     to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.large-button {
-    padding: 16px 32px;
-    font-size: 1.1rem;
-    border-radius: 9999px;
-    font-weight: 600;
-}
-
-/* Responsivo */
-@media (max-width: 768px) {
-    .search-bar {
-        padding: 10px 16px;
-    }
 }
