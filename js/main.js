@@ -1,5 +1,3 @@
-// js/main.js - Versão Corrigida (Busca funcionando corretamente)
-
 let produtos = [
     { id: 1, nome: "Morango Orgânico", preco: "R$ 100,00", unidade: "kg", descricao: "Caixa com 20kg fresquinho colhido hoje.", imagem: "img/produtos/morango.avif", categoria: "frutas", vendedor: "Maria Oliveira", local: "Itapetininga, SP", telefone: "(15) 98877-5544" },
     { id: 2, nome: "Milho Verde", preco: "R$ 80,00", unidade: "saco", descricao: "Saco de 30kg de Milho Verde de alta qualidade.", imagem: "img/produtos/milho.jpg", categoria: "graos", vendedor: "José Mendes", local: "Sorocaba, SP", telefone: "(15) 99712-3344" },
@@ -101,14 +99,26 @@ function handleAnunciarClick() {
 // Funções básicas de login/cadastro (mantidas simples por enquanto)
 function handleCadastro(e) {
     e.preventDefault();
-    alert("✅ Cadastro realizado com sucesso!");
-    window.location.href = "index.html";
+    const nome = document.getElementById('nome').value;
+    const email = document.getElementById('email').value;
+    
+    if (nome && email) {
+        alert(`✅ Cadastro realizado com sucesso!\n\nBem-vindo, ${nome}!`);
+        window.location.href = "index.html";
+    }
 }
 
 function handleLogin(e) {
+    
     e.preventDefault();
-    alert("✅ Login realizado com sucesso!");
-    window.location.href = "index.html";
+    const email = document.getElementById('login-email').value;
+    
+    if (email) {
+        usuarioLogado = { nome: email.split('@')[0], email: email };
+        localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
+        alert("Login realizado com sucesso!");
+        window.location.href = "index.html";
+    }
 }
 
 function logout() {
@@ -118,8 +128,16 @@ function logout() {
 
 // Inicialização da página
 function init() {
-    renderProducts(produtos);   // Mostra todos os produtos ao carregar a página
-    console.log('%c✅ Agro Conecta - Busca corrigida e funcionando!', 'color: #15803d; font-weight: bold');
+    // Verificar se usuário está logado
+    const savedUser = localStorage.getItem('usuarioLogado');
+    if (savedUser) {
+        usuarioLogado = JSON.parse(savedUser);
+        updateUserUI();
+    }
+    
+    renderProducts(produtos);
 }
 
 window.onload = init;
+
+
