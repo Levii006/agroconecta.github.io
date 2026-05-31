@@ -23,12 +23,12 @@ router.post('/', (req, res) => {
 
     function conferirLogin(email, senha) {
         const request = new Request(
-            `SELECT username FROM usuario WHERE email = '${email}' AND senha = '${senha}'`,
+            `SELECT nome, empresa, cnpj, telefone FROM usuario WHERE email = '${email}' AND senha = '${senha}'`,
             function(err, rowCount) {
                 if (err) {
                     console.log('Error querying data', err);        
                 } else if (rowCount > 0) {
-                    res.json({ message: 'Login realizado com sucesso!', validade: true, nome: tempNome});
+                    res.json({ message: 'Login realizado com sucesso!', validade: true, nome: tempNome, empresa: tempEmpresa, cnpj: tempCNPJ, telefone: tempTelefone});
                 } else {
                     res.json({ message: 'Email ou senha incorretos!', validade: false, nome: null });
                 }
@@ -36,10 +36,11 @@ router.post('/', (req, res) => {
         )
 
         request.on('row', function(columns) {
-            columns.forEach(function(column) {
-                tempNome = column.value;
-            })
-        });
+                tempNome = columns[0].value;
+                tempEmpresa = columns[1].value;
+                tempCNPJ = columns[2].value;
+                tempTelefone = columns[3].value;
+            });
 
 
         connection.execSql(request);

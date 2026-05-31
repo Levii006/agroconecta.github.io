@@ -24,7 +24,7 @@ function handleSearch() {
     }
 
     // Filtra os produtos que contenham o termo pesquisado
-    const produtosFiltrados = produtos.filter(produto => 
+    const produtosFiltrados = produtos.filter(produto =>
         produto.nome.toLowerCase().includes(termo) ||
         produto.descricao.toLowerCase().includes(termo) ||
         produto.categoria.toLowerCase().includes(termo)
@@ -32,7 +32,7 @@ function handleSearch() {
 
     // Mostra apenas os produtos filtrados
     renderProducts(produtosFiltrados);
-    
+
     // Garante que a seção de produtos seja exibida
     navigateToSection('comprar');
 }
@@ -73,7 +73,7 @@ function renderProducts(listaDeProdutos) {
 // ==================== NAVEGAÇÃO ====================
 function navigateToSection(section) {
     document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-    
+
     const targetSection = document.getElementById(section);
     if (targetSection) {
         targetSection.classList.remove('hidden');
@@ -96,31 +96,88 @@ function handleAnunciarClick() {
     window.location.href = "anunciar.html";
 }
 
-// Funções básicas de login/cadastro (mantidas simples por enquanto)
+// ================== FUNÇÕES DE AUTENTICAÇÃO ==================
+
+// CADASTRO:
 function handleCadastro(e) {
     e.preventDefault();
     const nome = document.getElementById('nome').value;
+    const empresa = document.getElementById('empresa').value;
+    const cnpj = document.getElementById('cnpj').value;
     const email = document.getElementById('email').value;
-    
-    if (nome && email) {
-        alert(`✅ Cadastro realizado com sucesso!\n\nBem-vindo, ${nome}!`);
-        window.location.href = "index.html";
+    const senha = document.getElementById('senha').value;
+    const telefone = document.getElementById('telefone').value;
+
+    if (nome && empresa && cnpj && email && senha && telefone) {
+
+        fetch('http://localhost:3000/cadastrar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome, empresa, cnpj, email, senha, telefone })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Resposta do servidor:', data);
+                if (data.validade === false) {
+                    alert('Cadastro já presente no sistema!');
+                    return;
+                }
+                alert(`✅ Cadastro realizado com sucesso!\n\nBem-vindo, ${nome}!`);
+                window.location.href = "index.html";
+                usuarioLogado = { nome, email, empresa, cnpj, telefone };
+                localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
+            })
+            .catch(error => {
+                console.error('Erro ao cadastrar usuário:', error);
+                alert('Erro ao cadastrar usuário. Verifique o console para detalhes.');
+            });
     }
 }
 
+// LOGIN
 function handleLogin(e) {
-    
-    e.preventDefault();
+
+   e.preventDefault();
     const email = document.getElementById('login-email').value;
+    const senha = document.getElementById('login-senha').value;
     
-    if (email) {
-        usuarioLogado = { nome: email.split('@')[0], email: email };
-        localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
-        alert("Login realizado com sucesso!");
-        window.location.href = "index.html";
+    if (email && senha) {
+        fetch('http://localhost:3000/login', {  
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, senha })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Resposta do servidor:', data);
+            if (data.validade === false) {
+                alert('Email ou senha incorretos!');
+                return;
+            }
+            alert(`Login realizado com sucesso!\n\nBem-vindo, ${data.nome}!`);
+            usuarioLogado = {nome: data.nome,  email, empresa: data.empresa, cnpj: data.cnpj, telefone: data.telefone};
+            localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
+            window.location.href = "index.html";
+        })
+        .catch(error => {
+            console.error('Erro ao fazer login:', error);
+            alert('Erro ao fazer login. Verifique o console para detalhes.');
+        });
     }
 }
 
+
+//LOGOUT 
 function logout() {
     localStorage.removeItem('usuarioLogado');
     window.location.href = "index.html";
@@ -129,15 +186,27 @@ function logout() {
 // Inicialização da página
 function init() {
     // Verificar se usuário está logado
-    const savedUser = localStorage.getItem('usuarioLogado');
-    if (savedUser) {
-        usuarioLogado = JSON.parse(savedUser);
-        updateUserUI();
+    const savedUser = JSON.parse(localStorage.getItem('usuarioLogado'));
+    let usuarioLogout = document.getElementById('user-logged-out');
+    let usuarioLogin = document.getElementById('user-logged-in');
+    const nomeUsuario = document.getElementById('user-name-display')
+
+    if (savedUser != null) {
+        usuarioLogout.setAttribute('class', 'hidden flex items-center gap-3');
+        usuarioLogin.setAttribute('class', 'items-center gap-3');
+        let nomeUsuarioTexto = JSON.stringify(savedUser.nome);
+        nomeUsuarioTexto = nomeUsuarioTexto.replace(/"/g, "");
+        nomeUsuario.textContent = nomeUsuarioTexto;
     }
-    
+    else {
+        usuarioLogout.setAttribute('class', 'flex items-center gap-3');
+        usuarioLogin.setAttribute('class', 'hidden items-center gap-3')
+    }
+
     renderProducts(produtos);
 }
 
-window.onload = init;
+
+
 
 
