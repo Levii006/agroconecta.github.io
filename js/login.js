@@ -1,4 +1,4 @@
-        
+
 const Connection = require('tedious').Connection;
 var Request = require('tedious').Request;
 var TYPES = require('tedious').TYPES;
@@ -12,41 +12,43 @@ router.post('/', (req, res) => {
     const { email, senha } = req.body;
 
     var connection = new Connection(config);
-        connection.on('connect', function(err) {
-            if (err) {
-                console.log('Connection failed', err);
-            } else {
-                console.log('Connected with Windows authentication');
-                conferirLogin(email, senha);
-            }
-        });
+    connection.on('connect', function (err) {
+        if (err) {
+            console.log('Connection failed', err);
+        } else {
+            console.log('Connected with Windows authentication');
+            conferirLogin(email, senha);
+        }
+    });
 
     function conferirLogin(email, senha) {
         const request = new Request(
-            `SELECT nome, empresa, cnpj, telefone FROM usuario WHERE email = '${email}' AND senha = '${senha}'`,
-            function(err, rowCount) {
+            `SELECT nome, empresa, cnpj, telefone, cidade, estado FROM usuario WHERE email = '${email}' AND senha = '${senha}'`,
+            function (err, rowCount) {
                 if (err) {
-                    console.log('Error querying data', err);        
+                    console.log('Error querying data', err);
                 } else if (rowCount > 0) {
-                    res.json({ message: 'Login realizado com sucesso!', validade: true, nome: tempNome, empresa: tempEmpresa, cnpj: tempCNPJ, telefone: tempTelefone});
+                    res.json({ message: 'Login realizado com sucesso!', validade: true, nome: tempNome, empresa: tempEmpresa, cnpj: tempCNPJ, cidade: tempCidade, estado: tempEstado, telefone: tempTelefone });
                 } else {
                     res.json({ message: 'Email ou senha incorretos!', validade: false, nome: null });
                 }
             }
         )
 
-        request.on('row', function(columns) {
-                tempNome = columns[0].value;
-                tempEmpresa = columns[1].value;
-                tempCNPJ = columns[2].value;
-                tempTelefone = columns[3].value;
-            });
+        request.on('row', function (columns) {
+            tempNome = columns[0].value;
+            tempEmpresa = columns[1].value;
+            tempCNPJ = columns[2].value;
+            tempTelefone = columns[3].value;
+            tempCidade = columns[4].value;
+            tempEstado = columns[5].value;
+        });
 
 
         connection.execSql(request);
     }
-    
-    
+
+
     connection.connect();
     connection.close();
 });
@@ -56,7 +58,7 @@ module.exports = router
 
 
 
-        
+
 /*const Connection = require('tedious').Connection;
 var Request = require('tedious').Request;
 const config = require('./dbconfig');

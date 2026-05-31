@@ -46,6 +46,47 @@
                         placeholder="00.000.000/0000-00">
                 </div>
 
+                <div class = "flex flex-row gap-8">
+                    <!-- CIDADE -->
+                     <div class = "grow">
+                        <label class="block text-sm font-medium mb-2">Cidade</label>
+                        <input id="cidade" type="text" required
+                            class="w-full border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-m font-medium mb-2">Estado</label>
+                        <select id="estado" name="estado" class="w-full border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
+                            <option value="AC">AC</option>
+                            <option value="AL">AL</option>
+                            <option value="AP">AP</option>
+                            <option value="AM">AM</option>
+                            <option value="BA">BA</option>
+                            <option value="CE">CE</option>
+                            <option value="DF">DF</option>
+                            <option value="ES">ES</option>
+                            <option value="GO">GO</option>
+                            <option value="MA">MA</option>
+                            <option value="MT">MT</option>
+                            <option value="MS">MS</option>
+                            <option value="MG">MG</option>
+                            <option value="PA">PA</option>
+                            <option value="PB">PB</option>
+                            <option value="PR">PR</option>
+                            <option value="PE">PE</option>
+                            <option value="PI">PI</option>
+                            <option value="RJ">RJ</option>
+                            <option value="RN">RN</option>
+                            <option value="RS">RS</option>
+                            <option value="RO">RO</option>
+                            <option value="RR">RR</option>
+                            <option value="SC">SC</option>
+                            <option value="SP">SP</option>
+                            <option value="SE">SE</option>
+                            <option value="TO">TO</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div>
                     <!-- EMAIL -->
                     <label class="block text-sm font-medium mb-2">E-mail</label>
@@ -94,7 +135,7 @@
 
         //mascara paa telefone
         const telefoneInput = document.getElementById('telefone');
-        telefoneInput.addEventListener('input', function (e) {  
+        telefoneInput.addEventListener('input', function (e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length > 11) value = value.slice(0, 11);
             value = value.replace(/^(\d{2})(\d)/, '($1) $2');

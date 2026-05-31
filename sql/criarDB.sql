@@ -11,6 +11,8 @@ create table usuario(
 	nome varchar(50) not null,
 	empresa varchar(50) not null,
 	cnpj varchar(18) not null,
+	cidade varchar(50) not null,
+	estado varchar(10) not null,
 	email varchar(25) not null,
 	senha varchar(256) not null,
 	telefone varchar(16) not null

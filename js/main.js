@@ -104,6 +104,9 @@ function handleCadastro(e) {
     const nome = document.getElementById('nome').value;
     const empresa = document.getElementById('empresa').value;
     const cnpj = document.getElementById('cnpj').value;
+    const cidade = document.getElementById('cidade').value;
+    const estadoId = document.getElementById('estado');
+    const estado = estadoId.options[estadoId.selectedIndex].text;
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
     const telefone = document.getElementById('telefone').value;
@@ -113,7 +116,7 @@ function handleCadastro(e) {
         fetch('http://localhost:3000/cadastrar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nome, empresa, cnpj, email, senha, telefone })
+            body: JSON.stringify({ nome, empresa, cnpj, cidade, estado, email, senha, telefone })
         })
             .then(response => {
                 if (!response.ok) {
@@ -129,7 +132,7 @@ function handleCadastro(e) {
                 }
                 alert(`✅ Cadastro realizado com sucesso!\n\nBem-vindo, ${nome}!`);
                 window.location.href = "index.html";
-                usuarioLogado = { nome, email, empresa, cnpj, telefone };
+                usuarioLogado = { nome, email, empresa, cnpj, cidade, estado, telefone };
                 localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
             })
             .catch(error => {
@@ -165,7 +168,7 @@ function handleLogin(e) {
                 return;
             }
             alert(`Login realizado com sucesso!\n\nBem-vindo, ${data.nome}!`);
-            usuarioLogado = {nome: data.nome,  email, empresa: data.empresa, cnpj: data.cnpj, telefone: data.telefone};
+            usuarioLogado = {nome: data.nome,  email, empresa: data.empresa, cnpj: data.cnpj, cidade: data.cidade, estado: data.estado, telefone: data.telefone};
             localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
             window.location.href = "index.html";
         })
@@ -189,14 +192,22 @@ function init() {
     const savedUser = JSON.parse(localStorage.getItem('usuarioLogado'));
     let usuarioLogout = document.getElementById('user-logged-out');
     let usuarioLogin = document.getElementById('user-logged-in');
-    const nomeUsuario = document.getElementById('user-name-display')
+    const nomeUsuario = document.getElementById('user-name-display');
+    const localUsuario = document.getElementById('user-location-display');
 
     if (savedUser != null) {
         usuarioLogout.setAttribute('class', 'hidden flex items-center gap-3');
         usuarioLogin.setAttribute('class', 'items-center gap-3');
+
         let nomeUsuarioTexto = JSON.stringify(savedUser.nome);
         nomeUsuarioTexto = nomeUsuarioTexto.replace(/"/g, "");
+        let cidadeUsuario = JSON.stringify(savedUser.cidade);
+        cidadeUsuario = cidadeUsuario.replace(/"/g, "");
+        let estadoUsuario = JSON.stringify(savedUser.estado);
+        estadoUsuario = estadoUsuario.replace(/"/g, "");
+
         nomeUsuario.textContent = nomeUsuarioTexto;
+        localUsuario.textContent = cidadeUsuario + ", " + estadoUsuario;
     }
     else {
         usuarioLogout.setAttribute('class', 'flex items-center gap-3');
