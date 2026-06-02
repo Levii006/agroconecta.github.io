@@ -86,6 +86,8 @@ function navigateToSection(section) {
 }
 
 // ==================== ANUNCIAR ====================
+
+//HOMEPAGE REDIRECT
 function handleAnunciarClick() {
     if (!usuarioLogado) {
         if (confirm("Para anunciar você precisa estar logado.\n\nDeseja fazer login?")) {
@@ -96,6 +98,46 @@ function handleAnunciarClick() {
     window.location.href = "anunciar.html";
 }
 
+//REGISTRAR ANUNCIO
+function handleRegistrarAnuncio(e) {
+    e.preventDefault();
+
+    const savedUser = JSON.parse(localStorage.getItem('usuarioLogado'));
+    var email = JSON.stringify(savedUser.email);
+    email = email.replace(/"/g, "");
+
+    const titulo = document.getElementById('nome-produto').value;
+    const preco = document.getElementById('preco').value;
+    const unidadeId = document.getElementById('unidade');
+    const unidade = unidadeId.options[unidadeId.selectedIndex].text;
+    const descricao = document.getElementById('descricao').value;
+
+    if (titulo && preco && unidade && descricao) {
+
+        fetch('http://localhost:3000/anunciar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, titulo, preco, unidade, descricao})
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Resposta do servidor:', data);
+
+                alert(`✅ Anuncio registrado com sucesso!!`);
+                window.location.href = "perfil.html";
+            })
+            .catch(error => {
+                console.error('Erro ao registrar produto:', error);
+                alert('Erro ao registrar produto. Verifique o console para detalhes.');
+            });
+    }
+
+}
 // ================== FUNÇÕES DE AUTENTICAÇÃO ==================
 
 // CADASTRO:
@@ -116,7 +158,7 @@ function handleCadastro(e) {
         fetch('http://localhost:3000/cadastrar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nome, empresa, cnpj, cidade, estado, email, senha, telefone })
+            body: JSON.stringify({ nome, empresa, cnpj, cidade, estado, email, senha, telefone, })
         })
             .then(response => {
                 if (!response.ok) {
@@ -132,7 +174,7 @@ function handleCadastro(e) {
                 }
                 alert(`✅ Cadastro realizado com sucesso!\n\nBem-vindo, ${nome}!`);
                 window.location.href = "index.html";
-                usuarioLogado = { nome, email, empresa, cnpj, cidade, estado, telefone };
+                usuarioLogado = { nome, email, empresa, cnpj, cidade, estado, telefone, };
                 localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
             })
             .catch(error => {
@@ -145,37 +187,37 @@ function handleCadastro(e) {
 // LOGIN
 function handleLogin(e) {
 
-   e.preventDefault();
+    e.preventDefault();
     const email = document.getElementById('login-email').value;
     const senha = document.getElementById('login-senha').value;
-    
+
     if (email && senha) {
-        fetch('http://localhost:3000/login', {  
+        fetch('http://localhost:3000/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, senha })
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Resposta do servidor:', data);
-            if (data.validade === false) {
-                alert('Email ou senha incorretos!');
-                return;
-            }
-            alert(`Login realizado com sucesso!\n\nBem-vindo, ${data.nome}!`);
-            usuarioLogado = {nome: data.nome,  email, empresa: data.empresa, cnpj: data.cnpj, cidade: data.cidade, estado: data.estado, telefone: data.telefone};
-            localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
-            window.location.href = "index.html";
-        })
-        .catch(error => {
-            console.error('Erro ao fazer login:', error);
-            alert('Erro ao fazer login. Verifique o console para detalhes.');
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Resposta do servidor:', data);
+                if (data.validade === false) {
+                    alert('Email ou senha incorretos!');
+                    return;
+                }
+                alert(`Login realizado com sucesso!\n\nBem-vindo, ${data.nome}!`);
+                usuarioLogado = { nome: data.nome, email, empresa: data.empresa, cnpj: data.cnpj, cidade: data.cidade, estado: data.estado, telefone: data.telefone };
+                localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
+                window.location.href = "index.html";
+            })
+            .catch(error => {
+                console.error('Erro ao fazer login:', error);
+                alert('Erro ao fazer login. Verifique o console para detalhes.');
+            });
     }
 }
 
@@ -186,7 +228,8 @@ function logout() {
     window.location.href = "index.html";
 }
 
-// Inicialização da página
+// ============= ATUALIZANDO HTML COM INFORMAÇÕES DE LOGIN ====================
+// Inicialização da página INDEX
 function init() {
     // Verificar se usuário está logado
     const savedUser = JSON.parse(localStorage.getItem('usuarioLogado'));
@@ -215,6 +258,33 @@ function init() {
     }
 
     renderProducts(produtos);
+}
+
+
+function preencherPerfil() {
+    //dados do usuario
+    const savedUser = JSON.parse(localStorage.getItem('usuarioLogado'));
+
+    const perfilNome = document.getElementById("perfil-nome");
+    const perfilEmail = document.getElementById("perfil-email");
+    const perfilTelefone = document.getElementById("perfil-telefone");
+
+    if (savedUser != null) {
+        let nomeUsuarioTexto = JSON.stringify(savedUser.nome);
+        nomeUsuarioTexto = nomeUsuarioTexto.replace(/"/g, "");
+        let emailUsuarioTexto = JSON.stringify(savedUser.email);
+        emailUsuarioTexto = emailUsuarioTexto.replace(/"/g, "");
+        let telefoneUsuarioTexto = JSON.stringify(savedUser.telefone);
+        telefoneUsuarioTexto = telefoneUsuarioTexto.replace(/"/g, "");
+
+
+
+        perfilNome.textContent = nomeUsuarioTexto;
+        perfilEmail.textContent = emailUsuarioTexto;
+        perfilTelefone.textContent = telefoneUsuarioTexto;
+    }
+
+    //quantidade de anuncios
 }
 
 

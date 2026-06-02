@@ -6,6 +6,7 @@ const port = 3000;
 //subarquivos
 const cadastrarRouter = require('./cadastrar')
 const loginRouter = require('./login')
+const anunciarRouter = require('./anunciar')
 
 //conexão front-end
 app.use(cors({
@@ -29,3 +30,4 @@ app.listen(port, () => {
 
 app.use('/cadastrar', cadastrarRouter);
 app.use('/login', loginRouter);
+app.use('/anunciar', anunciarRouter);
