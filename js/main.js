@@ -89,13 +89,14 @@ function navigateToSection(section) {
 
 //HOMEPAGE REDIRECT
 function handleAnunciarClick() {
-    if (!usuarioLogado) {
+    const savedUser = JSON.parse(localStorage.getItem('usuarioLogado'));
+    if (savedUser == null) {
         if (confirm("Para anunciar você precisa estar logado.\n\nDeseja fazer login?")) {
             window.location.href = "login.html";
         }
-        return;
+    } else {
+        window.location.href = "anunciar.html";
     }
-    window.location.href = "anunciar.html";
 }
 
 //REGISTRAR ANUNCIO
@@ -138,6 +139,9 @@ function handleRegistrarAnuncio(e) {
     }
 
 }
+
+//OBTER ANUNCIOS
+
 // ================== FUNÇÕES DE AUTENTICAÇÃO ==================
 
 // CADASTRO:
@@ -285,7 +289,38 @@ function preencherPerfil() {
     }
 
     //quantidade de anuncios
+    var contAnuncios = -1;
+    const totalAnuncios = document.getElementById("total-anuncios");
+    var email = JSON.stringify(savedUser.email);
+    email = email.replace(/"/g, "");
+
+    if (!email) {
+        return Promise.reject(new Error('Usuário não está logado ou email ausente.'));
+    }
+
+    fetch('http://localhost:3000/anunciosUser', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        }) 
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const quantidadeAnuncios = data.quantidade;
+                console.log('Resposta do servidor:', data);
+                contAnuncios = quantidadeAnuncios;
+                totalAnuncios.textContent = contAnuncios;
+            })
+            .catch(error => {
+                console.error('Erro ao contabilizar produtos:', error);
+                return 0;
+            });
 }
+
 
 
 

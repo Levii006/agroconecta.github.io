@@ -9,9 +9,7 @@ const router = express.Router();
 // Rota para cadastro
 router.post('/', (req, res) => {
     var idUsuario = -1;
-    const { email, titulo, preco, unidade, descricao } = req.body;
-    console.log(`Produto a ser cadastrado: Titulo: ${titulo}, preco: ${preco}, unidade: ${unidade}, descricao: ${descricao}`);
-    console.log(`Email do usuário: ${email}`)
+    const { email } = req.body;
 
     var connection = new Connection(config);
     connection.on('connect', function (err) {
@@ -24,34 +22,31 @@ router.post('/', (req, res) => {
     });
 
 
-    function registrarAnuncio(idUsuario, titulo, preco, unidade, descricao ) {
-        // ensure preco is a valid number; if not, set to 0 to avoid NULL insertion
-        let precoVal = parseFloat(preco);
-        if (!isFinite(precoVal)) {
-            precoVal = 0;
-        } else {
-            // normalize to two decimal places
-            precoVal = parseFloat(precoVal.toFixed(2));
-        }
-
+    function selecionarAnuncio(idUsuario) {
         const request = new Request(
-            `INSERT INTO anuncio (cod_vendedor, titulo, preco, unidade, descricao) VALUES (@idUsuario, @titulo, @preco, @unidade, @descricao)`,
-            function (err) {
+            `SELECT cod_vendedor, titulo, preco, unidade, descricao FROM anuncio WHERE cod_vendedor = @idusuario`,
+            function (err, rowCount) {
                 if (err) {
-                    console.log('Error inserting data', err);
+                    console.log('Error retaining data', err);
                 } else {
-                    console.log('Anúncio cadastrado com sucesso');
-                    res.status(200).json({ mensagem: 'Anúncio cadastrado com sucesso' });
+                    console.log('Anúncios obtidos com sucesso');
+                    res.json({quantidade: rowCount});
                 }
             }
         );
 
-        request.addParameter('idUsuario', TYPES.Int, Number(idUsuario));
-        request.addParameter('titulo', TYPES.VarChar, titulo);
-        request.addParameter('preco', TYPES.Numeric, precoVal);
-        request.addParameter('unidade', TYPES.VarChar, unidade);
-        request.addParameter('descricao', TYPES.VarChar, descricao);
+        request.on('row', function (columns) {
+            for (let i = 0; i < columns.length; i++) {
+                console.log(`Column ${i}: ${columns[i].value}`);
+            }
+        });
 
+        request.addParameter('idUsuario', TYPES.Int, Number(idUsuario));
+
+        request.addOutputParameter('titulo', TYPES.VarChar);
+        request.addOutputParameter('preco', TYPES.Numeric);
+        request.addOutputParameter('unidade', TYPES.VarChar);
+        request.addOutputParameter('descricao', TYPES.VarChar);
         connection.execSql(request);
     }
 
@@ -63,7 +58,7 @@ router.post('/', (req, res) => {
                     console.log('Error querying data', err);
                 } else {
                     console.log(`Consultando usuário com ID: ${idUsuario}`);
-                    registrarAnuncio(idUsuario, titulo, preco, unidade, descricao );
+                    selecionarAnuncio(idUsuario);
                 }
             }
         );
