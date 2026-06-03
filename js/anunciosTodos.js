@@ -8,18 +8,18 @@ const router = express.Router();
 
 // Rota para cadastro
 router.post('/', (req, res) => {
-    var idUsuario = -1;
-    const { email } = req.body;
 
     var tempTitulo = [];
     var tempPreco = [];
     var tempUnidade = [];
     var tempDescricao = [];
+    var tempNome = [];
 
     let titulo = null;
     let preco = null;
     let unidade = null;
     let descricao = null;
+    let nome = null;
 
     var connection = new Connection(config);
     connection.on('connect', function (err) {
@@ -27,20 +27,20 @@ router.post('/', (req, res) => {
             console.log('Connection failed', err);
         } else {
             console.log('Connected with Windows authentication');
-            obterID(email);
+            selecionarAnuncio();
         }
     });
 
 
-    function selecionarAnuncio(idUsuario) {
+    function selecionarAnuncio() {
         const request = new Request(
-            `SELECT titulo, preco, unidade, descricao FROM anuncio WHERE cod_vendedor = @idusuario`,
+            `SELECT titulo, preco, unidade, descricao, nome FROM anuncio, usuario WHERE cod_vendedor = cod_usuario`,
             function (err, rowCount) {
                 if (err) {
                     console.log('Error retaining data', err);
                 } else {
                     console.log('Anúncios obtidos com sucesso');
-                    res.json({ quantidade: rowCount, titulo: tempTitulo, preco: tempPreco, unidade: tempUnidade, descricao: tempDescricao });
+                    res.json({ quantidade: rowCount, titulo: tempTitulo, preco: tempPreco, unidade: tempUnidade, descricao: tempDescricao, nome: tempNome });
                 }
             }
         );
@@ -50,37 +50,17 @@ router.post('/', (req, res) => {
             tempPreco.push(columns[1].value);
             tempUnidade.push(columns[2].value);
             tempDescricao.push(columns[3].value);
+            tempNome.push(columns[4].value);
         });
 
-        request.addParameter('idUsuario', TYPES.Int, Number(idUsuario));
         request.addOutputParameter('titulo', TYPES.VarChar);
         request.addOutputParameter('preco', TYPES.Float);
         request.addOutputParameter('unidade', TYPES.VarChar);
         request.addOutputParameter('descricao', TYPES.VarChar);
+        request.addOutputParameter('nome', TYPES.VarChar);
         connection.execSql(request);
     }
 
-    function obterID(email) {
-        const request = new Request(
-            `SELECT cod_usuario FROM usuario WHERE email = @email`,
-            function (err, rowCount) {
-                if (err) {
-                    console.log('Error querying data', err);
-                } else {
-                    console.log(`Consultando usuário com ID: ${idUsuario}`);
-                    selecionarAnuncio(idUsuario);
-                }
-            }
-        );
-
-        request.addParameter('email', TYPES.VarChar, email);
-
-        request.on('row', function (columns) {
-            idUsuario = columns[0].value;
-            console.log(`ID do usuário obtido: ${idUsuario}`);
-        });
-        connection.execSql(request);
-    }
     connection.connect();
 });
 

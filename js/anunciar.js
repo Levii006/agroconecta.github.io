@@ -9,8 +9,8 @@ const router = express.Router();
 // Rota para cadastro
 router.post('/', (req, res) => {
     var idUsuario = -1;
-    const { email, titulo, preco, unidade, descricao } = req.body;
-    console.log(`Produto a ser cadastrado: Titulo: ${titulo}, preco: ${preco}, unidade: ${unidade}, descricao: ${descricao}`);
+    const { email, titulo, preco, unidade, categoria, descricao } = req.body;
+    console.log(`Produto a ser cadastrado: Titulo: ${titulo}, preco: ${preco}, unidade: ${unidade}, categoria: ${categoria}, descricao: ${descricao}`);
     console.log(`Email do usuário: ${email}`)
 
     var connection = new Connection(config);
@@ -24,22 +24,23 @@ router.post('/', (req, res) => {
     });
 
 
-    function registrarAnuncio(idUsuario, titulo, preco, unidade, descricao ) {
+    function registrarAnuncio(idUsuario, titulo, preco, unidade, categoria, descricao ) {
         // ensure preco is a valid number; if not, set to 0 to avoid NULL insertion
         let precoVal = parseFloat(preco);
         if (!isFinite(precoVal)) {
             precoVal = 0;
         } else {
             // normalize to two decimal places
-            precoVal = parseFloat(precoVal.toFixed(2));
+            precoVal = parseFloat(precoVal.toFixed(2)); 
         }
 
         const request = new Request(
-            `INSERT INTO anuncio (cod_vendedor, titulo, preco, unidade, descricao) VALUES (@idUsuario, @titulo, @preco, @unidade, @descricao)`,
+            `INSERT INTO anuncio (cod_vendedor, titulo, preco, unidade, categoria, descricao) VALUES (@idUsuario, @titulo, @preco, @unidade, @categoria, @descricao)`,
             function (err) {
                 if (err) {
                     console.log('Error inserting data', err);
                 } else {
+                    console.log(categoria);
                     console.log('Anúncio cadastrado com sucesso');
                     res.status(200).json({ mensagem: 'Anúncio cadastrado com sucesso' });
                 }
@@ -50,6 +51,7 @@ router.post('/', (req, res) => {
         request.addParameter('titulo', TYPES.VarChar, titulo);
         request.addParameter('preco', TYPES.Numeric, precoVal);
         request.addParameter('unidade', TYPES.VarChar, unidade);
+        request.addParameter('categoria', TYPES.VarChar, categoria);
         request.addParameter('descricao', TYPES.VarChar, descricao);
 
         connection.execSql(request);
@@ -63,7 +65,7 @@ router.post('/', (req, res) => {
                     console.log('Error querying data', err);
                 } else {
                     console.log(`Consultando usuário com ID: ${idUsuario}`);
-                    registrarAnuncio(idUsuario, titulo, preco, unidade, descricao );
+                    registrarAnuncio(idUsuario, titulo, preco, unidade, categoria, descricao );
                 }
             }
         );

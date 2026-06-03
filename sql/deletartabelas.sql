@@ -8,4 +8,7 @@ alter table anuncio
 drop table usuario
 drop table anuncio
 
+alter table anuncio
+add categoria varchar(50);
+
 go

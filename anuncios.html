@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agro Conecta • Marketplace do Campo</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- PRODUTOS -->
+    <section id="comprar" class="max-w-7xl mx-auto px-6 py-16 bg-white">
+        <div class="flex items-end justify-between mb-8">
+            <h1 class="text-4xl font-bold text-emerald-700">Meus anúncios</h1>
+            <a href="perfil.html" class="btn-secondary flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Voltar ao Início
+            </a>
+        </div>
+        <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"></div>
+    </section>
+</body>
+
+<script src="js/main.js"></script>
+<script>
+    window.onload = preencherPaginaAnuncios();
+</script>

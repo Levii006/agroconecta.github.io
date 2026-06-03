@@ -56,19 +56,20 @@ function renderProducts(listaDeProdutos) {
 
     listaDeProdutos.forEach(produto => {
         grid.innerHTML += `
-        <div onclick="showProductDetail(${produto.id})" class="product-card bg-white border rounded-3xl overflow-hidden cursor-pointer">
-            <img src="${produto.imagem}" class="w-full h-56 object-cover" alt="${produto.nome}">
+        <div onclick="" class="product-card bg-white border rounded-3xl overflow-hidden cursor-pointer">
+            <img src="${produto.imagem}" class="w-full h-56 object-cover" alt="${produto.titulo}">
             <div class="p-5">
                 <div class="flex justify-between items-start">
-                    <h4 class="font-semibold text-lg">${produto.nome}</h4>
+                    <h4 class="font-semibold text-lg">${produto.titulo}</h4>
                     <p class="text-emerald-600 font-bold">${produto.preco}</p>
                 </div>
                 <p class="text-sm text-gray-500 mt-1">${produto.descricao}</p>
-                <p class="text-xs text-emerald-600 mt-3">${produto.local}</p>
+                <p class="text-xs text-emerald-600 mt-3">${produto.nome}</p>
             </div>
         </div>`;
     });
 }
+
 
 // ==================== NAVEGAÇÃO ====================
 function navigateToSection(section) {
@@ -111,6 +112,8 @@ function handleRegistrarAnuncio(e) {
     const preco = document.getElementById('preco').value;
     const unidadeId = document.getElementById('unidade');
     const unidade = unidadeId.options[unidadeId.selectedIndex].text;
+    const categoriaId = document.getElementById('categoria');
+    const categoria = categoriaId.options[categoriaId.selectedIndex].text;
     const descricao = document.getElementById('descricao').value;
 
     if (titulo && preco && unidade && descricao) {
@@ -118,7 +121,7 @@ function handleRegistrarAnuncio(e) {
         fetch('http://localhost:3000/anunciar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, titulo, preco, unidade, descricao})
+            body: JSON.stringify({ email, titulo, preco, unidade, categoria, descricao })
         })
             .then(response => {
                 if (!response.ok) {
@@ -261,7 +264,59 @@ function init() {
         usuarioLogin.setAttribute('class', 'hidden items-center gap-3')
     }
 
-    renderProducts(produtos);
+    let anuncios = {};
+    let quantidadeAnuncios = -1;
+    //renderizando produtos
+    fetch('http://localhost:3000/anunciosTodos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            anuncios = data;
+            quantidadeAnuncios = data.quantidade;
+            const grid = document.getElementById('products-grid');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+
+            if (quantidadeAnuncios === -1) {
+                grid.innerHTML = `
+            <div class="col-span-full text-center py-16">
+                <p class="text-6xl mb-4">😕</p>
+                <p class="text-xl font-medium">Nenhum produto encontrado</p>
+                <p class="text-gray-500">Tente outra palavra-chave</p>
+            </div>`;
+            } else {
+                for (let i = 0; i < quantidadeAnuncios; i++) {
+                    const produto = anuncios[i];
+                    grid.innerHTML += `
+                <div onclick="" class="product-card bg-white border rounded-3xl overflow-hidden cursor-pointer">
+                    <img src="/img/template.png" class="w-full h-56 object-cover" alt="${data.titulo[i]}">
+                    <div class="p-5">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-semibold text-lg">${data.titulo[i]}</h4>
+                            <p class="text-emerald-600 font-bold">${data.preco[i]}</p>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1">${data.descricao[i]}</p>
+                        <p class="text-xs text-emerald-600 mt-3">${data.nome[i]}</p>
+                    </div>
+                </div>`;
+                };
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao contabilizar produtos:', error);
+            return 0;
+        });
+        realizarContagem();
+
+
 }
 
 
@@ -299,10 +354,86 @@ function preencherPerfil() {
     }
 
     fetch('http://localhost:3000/anunciosUser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const quantidadeAnuncios = data.quantidade;
+            console.log('Resposta do servidor:', data);
+            contAnuncios = quantidadeAnuncios;
+            totalAnuncios.textContent = contAnuncios;
+        })
+        .catch(error => {
+            console.error('Erro ao contabilizar produtos:', error);
+            return 0;
+        });
+}
+
+function preencherPaginaAnuncios() {
+    const savedUser = JSON.parse(localStorage.getItem('usuarioLogado'));
+    var contAnuncios = -1;
+    const totalAnuncios = document.getElementById("total-anuncios");
+    var email = JSON.stringify(savedUser.email);
+    email = email.replace(/"/g, "");
+
+    const grid = document.getElementById('products-grid');
+
+    let produtos = {};
+
+    if (!email) {
+        return Promise.reject(new Error('Usuário não está logado ou email ausente.'));
+    }
+
+
+    fetch('http://localhost:3000/anunciosUser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const quantidadeAnuncios = data.quantidade;
+            for (i = 0; i < quantidadeAnuncios; i++) {
+                grid.innerHTML += `
+                    <div onclick="showProductDetail()" class="product-card bg-white border rounded-3xl overflow-hidden cursor-pointer">
+                        <img src="/img/template.png" class="w-full h-56 object-cover" alt="${data.titulo[i]}">
+                        <div class="p-5">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-semibold text-lg">${data.titulo[i]}</h4>
+                                <p class="text-emerald-600 font-bold">R$${data.preco[i].toFixed(2)}</p>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1">${data.descricao[i]}</p>
+                        </div>
+                    </div>`;
+            }
+
+        })
+        .catch(error => {
+            console.error('Erro ao contabilizar produtos:', error);
+            return 0;
+        });
+
+}
+
+function realizarContagem(){
+    const graphContainer = document.getElementById('pie-chart');
+
+    fetch('http://localhost:3000/contabilizar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
-        }) 
+        })
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
@@ -310,18 +441,18 @@ function preencherPerfil() {
                 return response.json();
             })
             .then(data => {
-                const quantidadeAnuncios = data.quantidade;
                 console.log('Resposta do servidor:', data);
-                contAnuncios = quantidadeAnuncios;
-                totalAnuncios.textContent = contAnuncios;
+                let dataForChart = data.resultados.map(item => [item.categoria, item.quantidade]);
+                let chart = anychart.pie(dataForChart);
+                chart.title("Quantidade de Anúncios por Categoria");
+                chart.container('pie-chart');
+                chart.draw();
             })
             .catch(error => {
-                console.error('Erro ao contabilizar produtos:', error);
-                return 0;
+                console.error('Erro ao contabilizar:', error);
+                alert('Erro ao contabilizar. Verifique o console para detalhes.');
             });
-}
-
-
+    }
 
 
 

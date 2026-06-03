@@ -25,8 +25,8 @@ create table anuncio (
 	titulo varchar(50) not null,
 	preco numeric(10, 2) not null,
 	unidade varchar(10) not null,
+	categoria varchar(50) not null,
 	descricao varchar(500) not null
-	--imagem varbinary(max) not null,
 )
 go
 

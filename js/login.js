@@ -10,7 +10,6 @@ const router = express.Router();
 // Rota para cadastro
 router.post('/', (req, res) => {
     const { email, senha } = req.body;
-
     var connection = new Connection(config);
     connection.on('connect', function (err) {
         if (err) {

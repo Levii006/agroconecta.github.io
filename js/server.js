@@ -8,6 +8,8 @@ const cadastrarRouter = require('./cadastrar')
 const loginRouter = require('./login')
 const anunciarRouter = require('./anunciar')
 const anunciosUserRouter = require('./anunciosUser')
+const anunciosTodosRouter = require('./anunciosTodos')
+const contabilizarRouter = require('./contabilizar')
 
 //conexão front-end
 app.use(cors({
@@ -33,3 +35,5 @@ app.use('/cadastrar', cadastrarRouter);
 app.use('/login', loginRouter);
 app.use('/anunciar', anunciarRouter);
 app.use('/anunciosUser', anunciosUserRouter);
+app.use('/anunciosTodos', anunciosTodosRouter);
+app.use('/contabilizar', contabilizarRouter);
